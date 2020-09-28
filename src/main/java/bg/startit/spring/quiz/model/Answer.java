@@ -32,5 +32,6 @@ public class Answer {
     @Max(10)
     private int score;
     @ManyToOne
+    @NotNull
     private Question question;
 }
