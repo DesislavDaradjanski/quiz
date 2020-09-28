@@ -1,6 +1,7 @@
 package bg.startit.spring.quiz.repository;
 
 import bg.startit.spring.quiz.model.Answer;
+import bg.startit.spring.quiz.model.Question;
 import org.hamcrest.MatcherAssert;
 import org.hamcrest.Matchers;
 import org.junit.jupiter.api.AfterEach;
@@ -17,10 +18,13 @@ import static org.junit.jupiter.api.Assertions.*;
 class AnswerRepositoryTest {
     @Autowired
     private AnswerRepository answerRepository;
+    @Autowired
+    private QuestionRepository questionRepository;
+    private Question question;
 
     @Test
     void with_NullId_then_Save_must_Succeed() {
-        Answer answer = new Answer(null, "Alabala", true, 10, null);
+        Answer answer = new Answer(null, "Alabala", true, 10, question);
         // save - (answer is unmanaged object)
         answer = answerRepository.save(answer);
         assertNotNull(answer);
@@ -30,7 +34,7 @@ class AnswerRepositoryTest {
 
     @Test
     void with_SetId_then_Save_must_Succeed() {
-        Answer answer = new Answer(10L, "Alabala", true, 10, null);
+        Answer answer = new Answer(10L, "Alabala", true, 10, question);
         assertEquals(10l, answer.getId());
         // save - (answer is unmanaged object)
         answer = answerRepository.save(answer);
@@ -46,7 +50,7 @@ class AnswerRepositoryTest {
     @Test
     void with_NullDescription_then_Save_must_Fail() {
         assertThrows(RuntimeException.class, () -> {
-            Answer answer = new Answer(null, null, true, 5, null);
+            Answer answer = new Answer(null, null, true, 5, question);
             answer = answerRepository.save(answer);
         });
     }
@@ -54,17 +58,19 @@ class AnswerRepositoryTest {
     @Test
     void with_InvalidScore_then_Save_must_Fail() {
         assertThrows(RuntimeException.class, () -> {
-            Answer answer = new Answer(null, "Alabala", true, 20, null);
+            Answer answer = new Answer(null, "Alabala", true, 20, question);
             answer = answerRepository.save(answer);
         });
         assertThrows(RuntimeException.class, () -> {
-            Answer answer = new Answer(null, "Alabala", true, 0, null);
+            Answer answer = new Answer(null, "Alabala", true, 0, question);
             answer = answerRepository.save(answer);
         });
     }
 
     @BeforeEach
     void setUp() {
+        question = new Question(null, "Alabala", null, Question.Type.MultipleChoices);
+        questionRepository.save(question);
     }
 
     @AfterEach
