@@ -31,4 +31,6 @@ public class Answer {
     @Min(1)
     @Max(10)
     private int score;
+    @ManyToOne
+    private Question question;
 }

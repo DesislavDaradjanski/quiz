@@ -20,23 +20,24 @@ class AnswerRepositoryTest {
 
     @Test
     void with_NullId_then_Save_must_Succeed() {
-        Answer answer = new Answer(null, "Alabala",true, 10);
+        Answer answer = new Answer(null, "Alabala", true, 10, null);
         // save - (answer is unmanaged object)
         answer = answerRepository.save(answer);
         assertNotNull(answer);
         assertEquals(1, answerRepository.count());
         assertNotNull(answer.getId());
     }
+
     @Test
     void with_SetId_then_Save_must_Succeed() {
-        Answer answer = new Answer(10L, "Alabala",true, 10);
+        Answer answer = new Answer(10L, "Alabala", true, 10, null);
         assertEquals(10l, answer.getId());
         // save - (answer is unmanaged object)
         answer = answerRepository.save(answer);
         assertNotNull(answer);
         assertEquals(1, answerRepository.count());
         assertTrue(answer.getId() >= 100L);
-        assertThat("Must be > 100", answer.getId() , greaterThanOrEqualTo(100L));
+        assertThat("Must be > 100", answer.getId(), greaterThanOrEqualTo(100L));
     }
 
     // when(precondition) - then(action) - what(result)
@@ -45,7 +46,7 @@ class AnswerRepositoryTest {
     @Test
     void with_NullDescription_then_Save_must_Fail() {
         assertThrows(RuntimeException.class, () -> {
-            Answer answer = new Answer(null, null,true, 5);
+            Answer answer = new Answer(null, null, true, 5, null);
             answer = answerRepository.save(answer);
         });
     }
@@ -53,11 +54,11 @@ class AnswerRepositoryTest {
     @Test
     void with_InvalidScore_then_Save_must_Fail() {
         assertThrows(RuntimeException.class, () -> {
-            Answer answer = new Answer(null, "Alabala",true, 20);
+            Answer answer = new Answer(null, "Alabala", true, 20, null);
             answer = answerRepository.save(answer);
         });
         assertThrows(RuntimeException.class, () -> {
-            Answer answer = new Answer(null, "Alabala",true, 0);
+            Answer answer = new Answer(null, "Alabala", true, 0, null);
             answer = answerRepository.save(answer);
         });
     }
