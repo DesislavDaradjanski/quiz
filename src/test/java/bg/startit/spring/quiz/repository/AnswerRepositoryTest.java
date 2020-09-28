@@ -2,6 +2,7 @@ package bg.startit.spring.quiz.repository;
 
 import bg.startit.spring.quiz.model.Answer;
 import bg.startit.spring.quiz.model.Question;
+import bg.startit.spring.quiz.model.Quiz;
 import org.hamcrest.MatcherAssert;
 import org.hamcrest.Matchers;
 import org.junit.jupiter.api.AfterEach;
@@ -21,6 +22,9 @@ class AnswerRepositoryTest {
     @Autowired
     private QuestionRepository questionRepository;
     private Question question;
+    @Autowired
+    private QuizRepository quizRepository;
+    private Quiz quiz;
 
     @Test
     void with_NullId_then_Save_must_Succeed() {
@@ -69,12 +73,16 @@ class AnswerRepositoryTest {
 
     @BeforeEach
     void setUp() {
-        question = new Question(null, "Alabala", null, Question.Type.MultipleChoices);
+        quiz = new Quiz(null, "Alabalala", null, false);
+        quizRepository.save(quiz);
+        question = new Question(null, "Alabala", null, Question.Type.MultipleChoices, quiz);
         questionRepository.save(question);
     }
 
     @AfterEach
     void tearDown() {
         answerRepository.deleteAll();
+        questionRepository.delete(question);
+        quizRepository.delete(quiz);
     }
 }

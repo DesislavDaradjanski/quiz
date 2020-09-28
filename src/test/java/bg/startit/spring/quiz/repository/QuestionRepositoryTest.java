@@ -2,6 +2,7 @@ package bg.startit.spring.quiz.repository;
 
 import bg.startit.spring.quiz.model.Answer;
 import bg.startit.spring.quiz.model.Question;
+import bg.startit.spring.quiz.model.Quiz;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -22,13 +23,16 @@ public class QuestionRepositoryTest {
     private AnswerRepository answerRepository;
     @Autowired
     private QuestionRepository questionRepository;
+    private Quiz quiz;
+    @Autowired
+    private QuizRepository quizRepository;
 
     //positive test scenarios
     // - adding valid question
     @Test
     void with_validData_then_Save_must_succeed() {
         Question question = new Question(null, "with_validData_then_Save_must_succeed",
-                null, Question.Type.SingleChoice);
+                null, Question.Type.SingleChoice,quiz);
         questionRepository.save(question);
     }
 
@@ -36,7 +40,7 @@ public class QuestionRepositoryTest {
     @Test
     void with_validAnswers_then_save_must_succeed() {
         Question question = new Question(null, "with_validData_with_validAnswers",
-                null, Question.Type.SingleChoice);
+                null, Question.Type.SingleChoice,quiz);
         questionRepository.save(question);
         Answer answer = new Answer(null, "Answer1", true, 2, question);
         Answer answer2 = new Answer(null, "Answer2", false, 2, question);
@@ -50,7 +54,7 @@ public class QuestionRepositoryTest {
         assertThat(answers, hasItems(answer4));
         assertEquals(4, answers.size());
         Question question2 = new Question(null, "with_validData_with_no_answers",
-                null, Question.Type.SingleChoice);
+                null, Question.Type.SingleChoice,quiz);
         questionRepository.save(question2);
         answers = answerRepository.findByQuestion(question2);
         assertTrue(answers.isEmpty());
@@ -62,26 +66,26 @@ public class QuestionRepositoryTest {
     void with_invalidData_then_save_must_fail(){
         //Title is null
         assertThrows(TransactionException.class, () -> {
-            Question question = new Question(null, null, null, Question.Type.SingleChoice);
+            Question question = new Question(null, null, null, Question.Type.SingleChoice,quiz);
             questionRepository.save(question);
         });
         //Title is short
         assertThrows(TransactionException.class, () -> {
-            Question question = new Question(null, "ABCD", null, Question.Type.SingleChoice);
+            Question question = new Question(null, "ABCD", null, Question.Type.SingleChoice,quiz);
             questionRepository.save(question);
         });
         //Title is long
         assertThrows(TransactionException.class, () -> {
             char[] title = new char[1025];
             Arrays.fill(title, 'A');
-            Question question = new Question(null, new String(title), null, Question.Type.SingleChoice);
+            Question question = new Question(null, new String(title), null, Question.Type.SingleChoice,quiz);
             questionRepository.save(question);
         });
         //Description is long
         assertThrows(TransactionException.class, () -> {
             char[] desc = new char[1025];
             Arrays.fill(desc, 'A');
-            Question question = new Question(null, "Alabala", new String(desc), Question.Type.MultipleChoices);
+            Question question = new Question(null, "Alabala", new String(desc), Question.Type.MultipleChoices,quiz);
             questionRepository.save(question);
         });
     }
@@ -89,7 +93,7 @@ public class QuestionRepositoryTest {
     @Test
     void when_answer_has_no_question_then_save_must_fail(){
         Question question = new Question(null, "with_validData_with_validAnswers",
-                null, Question.Type.SingleChoice);
+                null, Question.Type.SingleChoice,quiz);
         questionRepository.save(question);
         Answer answer = new Answer(null, "Alabala", true, 5, null);
         assertThrows(TransactionException.class, () -> {
@@ -100,12 +104,14 @@ public class QuestionRepositoryTest {
 
     @BeforeEach
     void setUp() {
-
+        quiz = new Quiz(null, "Alabalala", null, false);
+        quizRepository.save(quiz);
     }
 
     @AfterEach
     void tearDown() {
         answerRepository.deleteAll();
         questionRepository.deleteAll();
+        quizRepository.delete(quiz);
     }
 }

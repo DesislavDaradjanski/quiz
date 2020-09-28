@@ -35,7 +35,9 @@ public class Question {
     private String description;
     @NotNull
     private Type type = Type.SingleChoice;
-
+    @ManyToOne
+    @NotNull
+    private Quiz quiz;
 
 
 }
