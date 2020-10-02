@@ -24,8 +24,6 @@ public class Quiz {
     private String title;
     @Size (max = 1024)
     private String description;
-    @OneToMany
-    private List<Question> questions;
     private boolean visible;
 
 
