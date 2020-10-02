@@ -15,13 +15,9 @@
     * isCorrect
     * score
 
--------
-* Result
-    * User
-    * quizId
-    * List<QuestionAnswers>
-      
-  
-* QuestionAnswers
-   * questionId
-   * List<Boolean>    
+* User
+    * name
+    * password
+    * email
+    * List<Answer> - @ManyToMany
+ 
