@@ -1,0 +1,272 @@
+{
+	"info": {
+		"_postman_id": "5bcecc8c-8348-4565-9c5c-e65770050b6e",
+		"name": "Quiz",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "Create Quiz",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"title\":\"Alabala\",\r\n    \"visible\":true\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:8080/api/v1/quizzes",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"api",
+						"v1",
+						"quizzes"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "List Quizzes",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:8080/api/v1/quizzes",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"api",
+						"v1",
+						"quizzes"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Read Quiz",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:8080/api/v1/quizzes/100",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"api",
+						"v1",
+						"quizzes",
+						"100"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Update Quiz",
+			"request": {
+				"method": "PUT",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"title\": \"Javaaaaaaaa\",\r\n    \"description\": \"Start it\",\r\n    \"visible\": true\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:8080/api/v1/quizzes/100",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"api",
+						"v1",
+						"quizzes",
+						"100"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Delete Quiz",
+			"request": {
+				"method": "DELETE",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:8080/api/v1/quizzes/100",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"api",
+						"v1",
+						"quizzes",
+						"100"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Create Question",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"title\": \"First Question\",\r\n    \"type\": \"SingleChoice\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:8080/api/v1/quizzes/88/questions",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"api",
+						"v1",
+						"quizzes",
+						"88",
+						"questions"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "List Questions",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:8080/api/v1/quizzes/1651/questions",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"api",
+						"v1",
+						"quizzes",
+						"1651",
+						"questions"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Read Question",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:8080/api/v1/quizzes/1651/questions/1651",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"api",
+						"v1",
+						"quizzes",
+						"1651",
+						"questions",
+						"1651"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Update Question",
+			"request": {
+				"method": "PUT",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"title\": \"Second Question\",\r\n    \"description\": \"Updated Question\",\r\n    \"type\": \"MultipleChoices\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:8080/api/v1/quizzes/1651/questions/3251",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"api",
+						"v1",
+						"quizzes",
+						"1651",
+						"questions",
+						"3251"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Delete Question",
+			"request": {
+				"method": "DELETE",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:8080/api/v1/quizzes/1651/questions/1651",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"api",
+						"v1",
+						"quizzes",
+						"1651",
+						"questions",
+						"1651"
+					]
+				}
+			},
+			"response": []
+		}
+	],
+	"protocolProfileBehavior": {}
+}
