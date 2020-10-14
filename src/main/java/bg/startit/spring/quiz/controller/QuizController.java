@@ -76,17 +76,23 @@ public class QuizController {
   }
 
   @DeleteMapping("/{id}")
-  public void deleteQuiz(@PathVariable Long id) {
+  public ResponseEntity<Void> deleteQuiz(@PathVariable Long id) {
+
+    if (!quizRepository.existsById(id)) {
+      return ResponseEntity.notFound().build();
+    }
     quizRepository.deleteById(id);
+    return ResponseEntity.ok().build();
   }
 
   @PutMapping("/{id}")
   @Transactional
   public ResponseEntity<Void> updateQuiz(@RequestBody Quiz quiz, @PathVariable Long id) {
+    Quiz toUpdate = quizRepository.getOne(id);
     if (!quizRepository.existsById(id)) {
       return ResponseEntity.notFound().build();
     }
-    Quiz toUpdate = quizRepository.getOne(id);
+
     // 2. modify the object
     toUpdate.setDescription(quiz.getDescription());
     toUpdate.setTitle(quiz.getTitle());
