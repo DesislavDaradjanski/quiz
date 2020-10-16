@@ -93,7 +93,7 @@ class QuizControllerTest {
   }
 
   @Test
-  void listQuizzes() throws Exception {
+  void listQuizzes_must_succeed() throws Exception {
     String link1 = createQuiz("Gotmar", true, "Derby");
     String link2 = createQuiz("Godfather", true, "Unknown");
     http.perform(get("/api/v1/quizzes"))
@@ -109,8 +109,59 @@ class QuizControllerTest {
         .andExpect(jsonPath("$.content[0].title").value("Gotmar"))
         .andExpect(jsonPath("$.content[1].title").value("Godfather"));
 
+    http.perform(get("/api/v1/quizzes")
+          .queryParam("page", "1")
+          .queryParam("size", "1"))
+        .andDo(print())
+        .andExpect(status().isOk())
+        .andExpect(jsonPath("$.totalPages").value(2))
+        .andExpect(jsonPath("$.totalElements").value(2))
+        .andExpect(jsonPath("$.numberOfElements").value(1))
+        .andExpect(jsonPath("$.number").value(1))
+        .andExpect(jsonPath("$.size").value(1))
+        .andExpect(jsonPath("$.first").value(Boolean.FALSE))
+        .andExpect(jsonPath("$.last").value(Boolean.TRUE))
+        .andExpect(jsonPath("$.content[0].title").value("Godfather"));
   }
 
+  @Test
+  void list_with_no_quizzes_must_succeed() throws Exception {
+    http.perform(get("/api/v1/quizzes").queryParam("size", "12"))
+        .andDo(print())
+        .andExpect(status().isOk())
+        .andExpect(jsonPath("$.totalPages").value(0))
+        .andExpect(jsonPath("$.totalElements").value(0))
+        .andExpect(jsonPath("$.numberOfElements").value(0))
+        .andExpect(jsonPath("$.size").value(12))
+        .andExpect(jsonPath("$.number").value(0))
+        .andExpect(jsonPath("$.first").value(Boolean.TRUE))
+        .andExpect(jsonPath("$.last").value(Boolean.TRUE))
+        .andExpect(jsonPath("$.content").isEmpty());
+
+  }
+
+  @Test
+  void  list_with_negative_page_must_fail(){
+    assertThrows(NestedServletException.class, () -> {
+      http.perform(get("/api/v1/quizzes").queryParam("page", "-1"))
+          .andDo(print());
+    });
+  }
+
+  @Test
+  void  list_with_negative_size_must_fail(){
+    assertThrows(NestedServletException.class, () -> {
+      http.perform(get("/api/v1/quizzes").queryParam("size", "-1"))
+          .andDo(print());
+    });
+  }
+  @Test
+  void  list_with_bigger_size_must_fail(){
+    assertThrows(NestedServletException.class, () -> {
+      http.perform(get("/api/v1/quizzes?size=101"))
+          .andDo(print());
+    });
+  }
 
   @Test
   void deleteQuiz_with_existing_link_must_succeed() throws Exception {
