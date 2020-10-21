@@ -18,7 +18,11 @@
           crossorigin="anonymous"></script>
   <script src="https://cdn.rawgit.com/visionmedia/page.js/master/page.js"></script>
   <title>Quiz/1</title>
+  <style>
+    .toast { position: absolute; top: 1em; right: 1em; z-index: 1000 }
+  </style>
 </head>
+
 <body>
 <nav class="navbar navbar-expand-sm navbar-light bg-light shadow">
   <a class="navbar-brand" href="#">
@@ -69,9 +73,14 @@
   </div>
 </nav>
 
-<div class="container-fluid">
-  <div id="notifications" class="bg-transparent"
-       style="position: absolute; z-index: 100; bottom: 1em; right: 1em;"></div>
+<div class="toast bg-danger" role="alert" aria-live="assertive" aria-atomic="true" data-delay="5000">
+  <div class="toast-header">
+    <svg class="bi mr-2" width="16" height="16" fill="currentColor">
+      <use xlink:href="bootstrap-icons.svg#bug"/>
+    </svg>
+    <strong class="mr-auto"></strong>
+  </div>
+  <div class="toast-body" style="white-space: pre">${message}</div>
 </div>
 
 <div class="container-fluid pt-4">
@@ -103,48 +112,14 @@
       </nav>
     </div>
     <div class="col-md-8 col-lg-8">
-      <h1 class="card-title" id="quizTitle">Quiz title</h1>
-      <h2 class="card-subtitle mb-2 text-muted" id="quizDescription">Quiz description</h2>
+      <h1 class="card-title" id="quizTitle">&lt;- Please select a quiz.</h1>
+      <h2 class="card-subtitle mb-2 text-muted" id="quizDescription"></h2>
       <form id="quizForm">
-        <div class="card mt-2">
-          <div class="card-body">
-            <h5 class="card-title">Question title</h5>
-            <h6 class="card-subtitle mb-2 text-muted">Question description</h6>
-            <div class="form-check">
-              <input class="form-check-input" type="checkbox" value="2001">
-              <label class="form-check-label">
-                Default checkbox
-              </label>
-            </div>
-            <div class="form-check">
-              <input class="form-check-input" type="checkbox" value="2002">
-              <label class="form-check-label">
-                Default checkbox
-              </label>
-            </div>
-          </div>
-        </div>
-        <div class="card mt-2">
-          <div class="card-body">
-            <h5 class="card-title">Question title</h5>
-            <h6 class="card-subtitle mb-2 text-muted">Question description</h6>
-            <div class="form-check">
-              <input class="form-check-input" type="radio" name="exampleRadios" value="option1"
-                     checked>
-              <label class="form-check-label" >
-                Default radio
-              </label>
-            </div>
-            <div class="form-check">
-              <input class="form-check-input" type="radio" name="exampleRadios" value="option2"
-                     checked>
-              <label class="form-check-label" >
-                Default radio 2
-              </label>
-            </div>
-          </div>
-        </div>
+        <div>&nbsp;</div>
       </form>
+      <div class="pt-4">
+        <button id="quizSubmit" class="btn btn-primary" >Submit</button>
+      </div>
     </div>
   </div>
 

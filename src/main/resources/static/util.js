@@ -32,18 +32,8 @@ function htmlDecode(t){
 }
 // notify utility function
 function notify(title, message) {
-  message = htmlDecode(message);
-  $(`<div class="toast" role="alert"  aria-live="assertive" aria-atomic="true" data-delay="5000">
-       <div class="toast-header">
-         <img src="images/favicon.png" width="32px" class="rounded mr-2" alt="favicon">
-         <strong class="mr-auto">${title}</strong>
-       </div>
-       <div class="toast-body" style="white-space: pre">${message}</div>
-     </div>`)
-     .toast()
-     .toast('show')
-     .on('hidden.bs.toast', function() {
-        $(this).toast('dispose').remove();
-     })
-     .appendTo('#notifications');
+  $('.toast')
+    .find('.toast-header > strong').text(title).end()
+    .find('.toast-body').text(htmlDecode(message)).end()
+    .toast('show');
 }
