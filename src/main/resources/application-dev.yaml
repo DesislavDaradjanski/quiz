@@ -1,0 +1,11 @@
+spring:
+  datasource:
+    # load sample data
+    data: classpath:/data-dev.sql
+    # don't save it!
+    url: jdbc:h2:mem:./target/quiz
+  resources:
+    # make it easy to develop the web site
+    static-locations:
+    - file:src/main/resources/static/
+    - classpath:/static/
