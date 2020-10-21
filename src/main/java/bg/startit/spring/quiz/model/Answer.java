@@ -28,7 +28,7 @@ public class Answer {
     @Column(nullable = false,length = 512) //JPA / DB
     private String description;
     private boolean correct;
-    @Min(1)
+    @Min(0)
     @Max(10)
     private int score;
     @ManyToOne

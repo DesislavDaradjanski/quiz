@@ -11,13 +11,13 @@ INSERT INTO "QUESTION" (id, title, description, type, quiz_id) VALUES
  (2, 'Question with description', 'Some description here', 0, 1),
  (3, 'Multiple choices question', 'Here comes multi-choice!', 1, 2);
 
--- the score is >1 but should accept 0!
+
 INSERT INTO "ANSWER" (id, description, correct, score, question_id) VALUES
  (1, 'Answer 1', TRUE, 9, 1),
- (2, 'Answer 2', FALSE, 1, 1),
- (3, 'Answer 3', FALSE, 1, 1),
+ (2, 'Answer 2', FALSE, 0, 1),
+ (3, 'Answer 3', FALSE, 0, 1),
  (4, 'M-1', TRUE, 5, 3),
  (5, 'M-2', TRUE, 5, 3),
- (6, 'M-3', FALSE, 1, 3);
+ (6, 'M-3', FALSE, 0, 3);
 
 COMMIT;
