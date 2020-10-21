@@ -42,7 +42,7 @@ public class QuestionController {
   private QuizRepository quizRepository;
 
   @PostMapping
-  public ResponseEntity<Void> createQuiz(@PathVariable Long quizId,
+  public ResponseEntity<Void> createQuestion(@PathVariable Long quizId,
       @RequestBody Question question) {
     if (!quizRepository.existsById(quizId)) {
       return ResponseEntity.notFound().build();

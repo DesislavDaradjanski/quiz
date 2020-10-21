@@ -88,10 +88,10 @@ public class QuizController {
   @PutMapping("/{id}")
   @Transactional
   public ResponseEntity<Void> updateQuiz(@RequestBody Quiz quiz, @PathVariable Long id) {
-    Quiz toUpdate = quizRepository.getOne(id);
     if (!quizRepository.existsById(id)) {
       return ResponseEntity.notFound().build();
     }
+    Quiz toUpdate = quizRepository.getOne(id);
 
     // 2. modify the object
     toUpdate.setDescription(quiz.getDescription());
