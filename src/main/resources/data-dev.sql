@@ -20,4 +20,8 @@ INSERT INTO "ANSWER" (id, description, correct, score, question_id) VALUES
  (5, 'M-2', TRUE, 5, 3),
  (6, 'M-3', FALSE, 1, 3);
 
+-- password is 'admin'
+INSERT INTO "USER" (id, name, pwd, email) VALUES
+ (1, 'admin', '$2a$10$M/QuIW0TWmNwooXWtTcdqu2DFez9mcAK0ERgmRyTJdPwS7siom8ya', 'admin@abv.bg');
+
 COMMIT;
