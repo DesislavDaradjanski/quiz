@@ -3,6 +3,18 @@ var quizForm = $('#quizForm').submit(function(e) {
 });
 
 var quizSubmit = $('#quizSubmit');
+$('#passwordChangeButton').click(function() {
+  var data = {
+    currentPassword: $('#currentPassword').val(),
+    newPassword: $('#newPassword').val(),
+    newPasswordAgain: $('#newPasswordAgain').val()
+  }
+  f('/api/v1/users/me', data, true, {}, 'put')
+    .then((data) => {
+      $('#changePasswordForm')[0].reset();
+      $('#passwordDialog').modal('hide');
+    });
+})
 
 function getQuizzes() {
   f('/api/v1/quizzes')
@@ -71,6 +83,13 @@ function renderQuestion(quizId, question) {
     });
   return card;
 }
+function getUser() {
+  f(`/api/v1/users/me`)
+    .then((data) => {
+      $('#userName').text(data.name);
+    });
+}
 
 getQuizzes();
+getUser();
 //getQuiz(1);

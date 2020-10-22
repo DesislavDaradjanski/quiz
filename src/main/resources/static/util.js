@@ -2,13 +2,18 @@
 const baseURL = window.location;
 
 // fetch utility function
-function f(path, body=null, json=true, queryParams={}) {
+function f(path, body=null, json=true, queryParams={}, method='post') {
   var url = new URL(baseURL);
   url.pathname = path;
   Object.entries(queryParams).forEach((e)=>{
     url.searchParams.append(e[0], e[1]);
   })
-  return (body == null ? fetch(url) : fetch(url, { method: 'post', body: body }))
+  var headers = {};
+  if (body != null && typeof body == 'object') {
+    headers['Content-Type'] = 'application/json';
+    body = JSON.stringify(body);
+  }
+  return (body == null ? fetch(url) : fetch(url, { method: method, body: body, headers: headers }))
     .then((response) => {
       console.log(response);
       if (response.status === 401) { // not authorized
@@ -17,9 +22,14 @@ function f(path, body=null, json=true, queryParams={}) {
       }
       if (response.status >= 400) {
         var err = `Error #${response.status}`;
-        response.json().then((m) => {
+        response.json()
+        .then((m) => {
           notify(err, JSON.stringify(m, null, '  '));
-        });
+        })
+        .catch(() => {
+          notify(err, response.statusText | response.status );
+        })
+;
         throw err;
       }
       return json ? response.json() : response;
