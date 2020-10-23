@@ -1,9 +1,14 @@
 package bg.startit.spring.quiz.dto;
 
+
+import bg.startit.spring.quiz.validation.ValidPassword;
+
 public class ChangePasswordRequest {
 
-  String currentPassword ;
+  String currentPassword;
+  @ValidPassword
   String newPassword;
+  @ValidPassword
   String newPasswordAgain;
 
   public String getCurrentPassword() {
