@@ -117,7 +117,7 @@ public class AnswerController {
   // /api/v1/quizzes/{quizId}/questions/{questionId}/answers/{answerId}
   @PutMapping("/{id}")
   @Transactional
-  public ResponseEntity<Void> updateAnswer(
+  public ResponseEntity<Answer> updateAnswer(
       @PathVariable Long quizId,
       @PathVariable Long questionId,
       @PathVariable Long answerId,
@@ -131,6 +131,6 @@ public class AnswerController {
     toUpdate.setScore(answer.getScore());
 
     answerRepository.save(toUpdate);
-    return ResponseEntity.noContent().build();
+    return ResponseEntity.ok(toUpdate);
   }
 }

@@ -87,7 +87,7 @@ public class QuizController {
 
   @PutMapping("/{id}")
   @Transactional
-  public ResponseEntity<Void> updateQuiz(@RequestBody Quiz quiz, @PathVariable Long id) {
+  public ResponseEntity<Quiz> updateQuiz(@RequestBody Quiz quiz, @PathVariable Long id) {
     if (!quizRepository.existsById(id)) {
       return ResponseEntity.notFound().build();
     }
@@ -99,15 +99,9 @@ public class QuizController {
     toUpdate.setVisible(quiz.isVisible());
     // 3. save the object
     quizRepository.save(toUpdate);
-    URI redirect = ServletUriComponentsBuilder
-        .fromCurrentRequest()
-        .build()
-        .toUri();
-    return ResponseEntity
-        .status(HttpStatus.FOUND)
-        .location(redirect)
-        .build();
-    // 1. read the object
+
+    return ResponseEntity.ok(toUpdate);
+
   }
 
   // GET /api/v1/quizzes

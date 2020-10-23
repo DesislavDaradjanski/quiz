@@ -58,7 +58,7 @@ public class UserController {
   }
 
   @PutMapping("/me")
-  public ResponseEntity<Void> updatePassword(@RequestBody ChangePasswordRequest passwordRequest) {
+  public ResponseEntity<User> updatePassword(@RequestBody ChangePasswordRequest passwordRequest) {
     User toUpdate = getCurrentUser();
     // 1. check current password
     String currentHash = toUpdate.getPassword();
@@ -75,14 +75,8 @@ public class UserController {
     String encodedPassword = passwordEncoder.encode(passwordRequest.getNewPassword());
     toUpdate.setPasswordHash(encodedPassword.toCharArray());
     userRepository.save(toUpdate);
-    URI redirect = ServletUriComponentsBuilder
-        .fromCurrentRequest()
-        .build()
-        .toUri();
-    return ResponseEntity
-        .status(HttpStatus.FOUND)
-        .location(redirect)
-        .build();
+
+    return ResponseEntity.ok(toUpdate);
   }
 
   @DeleteMapping("/me")

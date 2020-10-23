@@ -103,7 +103,7 @@ public class QuestionController {
 
   @PutMapping("/{questionId}")
   @Transactional
-  public ResponseEntity<Void> updateQuestion(@RequestBody Question question,
+  public ResponseEntity<Question> updateQuestion(@RequestBody Question question,
       @PathVariable Long questionId) {
     if (!questionRepository.existsById(questionId)) {
       return ResponseEntity.notFound().build();
@@ -115,14 +115,8 @@ public class QuestionController {
     toUpdate.setType(question.getType());
     // 3. save the object
     questionRepository.save(toUpdate);
-    URI redirect = ServletUriComponentsBuilder
-        .fromCurrentRequest()
-        .build()
-        .toUri();
-    return ResponseEntity
-        .status(HttpStatus.FOUND)
-        .location(redirect)
-        .build();
+
+    return ResponseEntity.ok(toUpdate);
 
   }
 
