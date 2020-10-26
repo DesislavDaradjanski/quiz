@@ -26,6 +26,7 @@ paths:
         required: true
         schema:
           type: integer
+          format: int64
 
     get:
       tags: [ Quiz ]
@@ -105,11 +106,13 @@ paths:
         required: true
         schema:
           type: integer
+          format: int64
       - name: questionId
         in: path
         required: true
         schema:
           type: integer
+          format: int64
 
     get:
       tags: [ Answer ]
@@ -155,16 +158,19 @@ paths:
         required: true
         schema:
           type: integer
+          format: int64
       - name: questionId
         in: path
         required: true
         schema:
           type: integer
+          format: int64
       - name: answerId
         in: path
         required: true
         schema:
           type: integer
+          format: int64
 
     delete:
       tags: [ Answer ]
@@ -268,6 +274,7 @@ paths:
         required: true
         schema:
           type: integer
+          format: int64
 
     get:
       tags: [ Question ]
@@ -324,11 +331,13 @@ paths:
         required: true
         schema:
           type: integer
+          format: int64
       - name: questionId
         in: path
         required: true
         schema:
           type: integer
+          format: int64
 
     get:
       tags: [ Question ]
