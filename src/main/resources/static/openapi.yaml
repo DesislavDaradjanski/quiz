@@ -261,6 +261,122 @@ paths:
           description: ok
           content: { }
 
+  '/api/v1/quizzes/{quizId}/questions':
+    parameters:
+      - name: quizId
+        in: path
+        required: true
+        schema:
+          type: integer
+
+    get:
+      tags: [ Question ]
+      summary: List questions
+      operationId: listQuestion
+      parameters:
+        - name: page
+          in: query
+          required: false
+          schema:
+            type: integer
+            default: 0
+            minimum: 0
+        - name: size
+          in: query
+          required: false
+          schema:
+            type: integer
+            default: 20
+            minimum: 0
+            maximum: 100
+      responses:
+        '404':
+          description: Not found
+          content: { }
+        '200':
+          description: Page of questions
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/QuestionList'
+    post:
+      tags: [ Question ]
+      summary: Create question
+      operationId: createQuestion
+      requestBody:
+        description: The object that describes the question we want to create.
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateQuestionRequest'
+      responses:
+        '404':
+          description: The object is not found.
+          content: {}
+        '201':
+          description: Created
+          content: {}
+
+  '/api/v1/quizzes/{quizId}/questions/{questionId}':
+    parameters:
+      - name: quizId
+        in: path
+        required: true
+        schema:
+          type: integer
+      - name: questionId
+        in: path
+        required: true
+        schema:
+          type: integer
+
+    get:
+      tags: [ Question ]
+      summary: Get Question
+      operationId: readQuestion
+      responses:
+        '200':
+          description: Question details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/QuestionResponse'
+        '404':
+          description: Question doesn't exist
+          content: {}
+
+    delete:
+      tags: [ Question ]
+      summary: Delete Question
+      operationId: deleteQuestion
+      responses:
+        '200':
+          description: Question is deleted successfully
+          content: {}
+        '404':
+          description: Question doesn't exist
+          content: {}
+
+    put:
+      tags: [ Question ]
+      summary: Update question
+      operationId: updateQuestion
+      requestBody:
+        description: The object that describes the question we want to create.
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateQuestionRequest'
+      responses:
+        '404':
+          description: The object is not found.
+          content: {}
+        '200':
+          description: The updated questions.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/QuestionResponse'
 
 components:
   schemas:
@@ -385,3 +501,45 @@ components:
           minLength: 1
           maxLength: 10
           type: integer
+
+    CreateQuestionRequest:
+      type: object
+      required: [ title, type ]
+      properties:
+        title:
+          minLength: 5
+          maxLength: 1024
+          type: string
+        description:
+          maxLength: 256
+          type: string
+        type:
+          type: string
+
+    QuestionResponse:
+      allOf:
+        - $ref: '#/components/schemas/CreateQuestionRequest'
+        - type: object
+          required: [ id ]
+          properties:
+            id:
+              type: integer
+
+    QuestionList:
+      type: object
+      required: [ totalPages, totalElements, number, size, numberOfElements, content ]
+      properties:
+        totalPages:
+          type: integer
+        totalElements:
+          type: integer
+        number:
+          type: integer
+        size:
+          type: integer
+        numberOfElements:
+          type: integer
+        content:
+          type: array
+          items:
+            $ref: '#/components/schemas/QuestionResponse'
