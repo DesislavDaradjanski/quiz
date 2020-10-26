@@ -7,6 +7,7 @@ import java.util.Set;
 import javax.validation.ConstraintViolation;
 import javax.validation.Validation;
 import javax.validation.Validator;
+import lombok.Data;
 import org.junit.jupiter.api.Test;
 
 class PasswordConstraintValidatorTest {
@@ -22,64 +23,67 @@ class PasswordConstraintValidatorTest {
   // - has space
   // - too small
 
+  @Data
+  class PasswordBean {
+    @ValidPassword
+    private String password;
+  }
+
 
   @Test
   public void with_valid_password_validation_should_pass() {
-    Set<ConstraintViolation<ChangePasswordRequest>> errors = getConstraintViolations("Qwerty1234!");
+    Set<ConstraintViolation<PasswordBean>> errors = getConstraintViolations("Qwerty1234!");
     assertTrue(errors.isEmpty());
   }
 
   @Test
   public void without_upperCase_password_validation_should_fail() {
-    Set<ConstraintViolation<ChangePasswordRequest>> errors = getConstraintViolations("qwerty1234!");
+    Set<ConstraintViolation<PasswordBean>> errors = getConstraintViolations("qwerty1234!");
     assertFalse(errors.isEmpty());
   }
 
   @Test
   public void without_lowerCase_password_validation_should_fail() {
-    Set<ConstraintViolation<ChangePasswordRequest>> errors = getConstraintViolations("QWERTY1234!");
+    Set<ConstraintViolation<PasswordBean>> errors = getConstraintViolations("QWERTY1234!");
     assertFalse(errors.isEmpty());
   }
 
   @Test
   public void without_digits_password_validation_should_fail() {
-    Set<ConstraintViolation<ChangePasswordRequest>> errors = getConstraintViolations("qwertyasdQ!");
+    Set<ConstraintViolation<PasswordBean>> errors = getConstraintViolations("qwertyasdQ!");
     assertFalse(errors.isEmpty());
   }
 
   @Test
   public void with_space_password_validation_should_fail() {
-    Set<ConstraintViolation<ChangePasswordRequest>> errors = getConstraintViolations(
+    Set<ConstraintViolation<PasswordBean>> errors = getConstraintViolations(
         "Dwerty1234! ");
     assertFalse(errors.isEmpty());
   }
 
   @Test
   public void without_specialSymbol_password_validation_should_fail() {
-    Set<ConstraintViolation<ChangePasswordRequest>> errors = getConstraintViolations("qwertyssS1");
+    Set<ConstraintViolation<PasswordBean>> errors = getConstraintViolations("qwertyssS1");
     assertFalse(errors.isEmpty());
   }
 
   @Test
   public void short_password_validation_should_fail() {
-    Set<ConstraintViolation<ChangePasswordRequest>> errors = getConstraintViolations("Qw1!");
+    Set<ConstraintViolation<PasswordBean>> errors = getConstraintViolations("Qw1!");
     assertFalse(errors.isEmpty());
   }
 
   @Test
   public void long_password_validation_should_fail() {
-    Set<ConstraintViolation<ChangePasswordRequest>> errors = getConstraintViolations(
+    Set<ConstraintViolation<PasswordBean>> errors = getConstraintViolations(
         "Qw1!qwewqewqewqewqewqewqewqeqweqwewqeqweqweqweqwew");
     assertFalse(errors.isEmpty());
   }
 
-  private Set<ConstraintViolation<ChangePasswordRequest>> getConstraintViolations(String password) {
-    ChangePasswordRequest changePasswordRequest = new ChangePasswordRequest()
-        .setCurrentPassword(password)
-        .setNewPassword(password)
-        .setNewPasswordAgain(password);
-    return validator
-        .validate(changePasswordRequest);
+  private Set<ConstraintViolation<PasswordBean>> getConstraintViolations(String password) {
+    PasswordBean bean = new PasswordBean();
+    bean.setPassword(password);
+    return validator.validate(bean);
   }
 
 }
