@@ -98,8 +98,106 @@ paths:
           description: The object is created. The response contains redirect to the quiz.
           content: {}
 
+  '/api/v1/users':
+    post:
+      tags: [ User ]
+      summary: Create user
+      description: This can only be done by the logged in user.
+      operationId: createUser
+      requestBody:
+        description: Created user object
+        content:
+          'application/json':
+            schema:
+              $ref: '#/components/schemas/CreateUserRequest'
+        required: true
+      responses:
+        default:
+          description: successful operation
+          content: { }
+
+
+  '/api/v1/users/me':
+    get:
+      tags: [ User ]
+      summary: Get the current user
+      operationId: readUser
+      responses:
+        200:
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserResponse'
+
+    put:
+      tags: [ User ]
+      summary: Updated user password
+      description: This can only be done by the logged in user.
+      operationId: updatePassword
+      requestBody:
+        description: Updated user object
+        content:
+          'application/json':
+            schema:
+              $ref: '#/components/schemas/ChangePasswordRequest'
+        required: true
+      responses:
+        200:
+          description: ok
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserResponse'
+
+    delete:
+      tags: [ User ]
+      summary: Delete user
+      description: This can only be done by the logged in user.
+      operationId: deleteUser
+      responses:
+        200:
+          description: ok
+          content: { }
+
+
 components:
   schemas:
+
+    ChangePasswordRequest:
+      type: object
+      properties:
+        currentPassword:
+          format: password
+          type: string
+        newPassword:
+          format: password
+          type: string
+        newPasswordAgain:
+          format: password
+          type: string
+
+    CreateUserRequest:
+      type: object
+      properties:
+        username:
+          type: string
+        email:
+          format: email
+          type: string
+        password:
+          format: password
+          type: string
+        passwordAgain:
+          format: password
+          type: string
+
+    UserResponse:
+      type: object
+      properties:
+        username:
+          type: string
+
     Quiz:
       allOf:
         - $ref: '#/components/schemas/CreateQuizRequest'
