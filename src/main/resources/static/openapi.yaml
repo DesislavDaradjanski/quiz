@@ -37,7 +37,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Quiz'
+                $ref: '#/components/schemas/QuizResponse'
         404:
           description: Quiz doesn't exists
           content: {}
@@ -415,7 +415,7 @@ components:
         username:
           type: string
 
-    Quiz:
+    QuizResponse:
       allOf:
         - $ref: '#/components/schemas/CreateQuizRequest'
         - type: object
@@ -441,7 +441,7 @@ components:
         content:
           type: array
           items:
-            $ref: '#/components/schemas/Quiz'
+            $ref: '#/components/schemas/QuizResponse'
 
     CreateQuizRequest:
       type: object

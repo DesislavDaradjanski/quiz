@@ -49,21 +49,14 @@ public class UserController {
   public ResponseEntity<UserResponse> readUser() {
     User current = getCurrentUser();
     return ResponseEntity.ok(new UserResponse()
-        .setName(current.getName()));
-  }
-
-  public static void main(String[] args) {
-    char[] x = "alabala".toCharArray();
-    System.out.println(x.toString());
+        .username(current.getName()));
   }
 
   @PutMapping("/me")
   public ResponseEntity<User> updatePassword(@RequestBody ChangePasswordRequest passwordRequest) {
     User toUpdate = getCurrentUser();
     // 1. check current password
-    String currentHash = toUpdate.getPassword();
-    String currentHash2 = passwordEncoder.encode(passwordRequest.getCurrentPassword());
-    if (!currentHash.equals(currentHash2)) {
+    if (!passwordEncoder.matches(passwordRequest.getCurrentPassword(), toUpdate.getPassword())) {
       return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
     }
 
