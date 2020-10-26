@@ -98,8 +98,108 @@ paths:
           description: The object is created. The response contains redirect to the quiz.
           content: {}
 
+          '/api/v1/users':
+            post:
+              tags:
+                - user
+              summary: Create user
+              description: This can only be done by the logged in user.
+              operationId: createUser
+              requestBody:
+                description: Created user object
+                content:
+                  '*/*':
+                    schema:
+                      $ref: '#/components/schemas/User'
+                required: true
+              responses:
+                default:
+                  description: successful operation
+                  content: { }
+              x-codegen-request-body-name: body
+
+            get:
+              tags:
+                - user
+              summary: Logs user into the system
+              operationId: loginUser
+              parameters:
+                - name: username
+                  in: query
+                  description: The user name for login
+                  required: true
+                  schema:
+                    type: string
+                - name: password
+                  in: query
+                  description: The password for login in clear text
+                  required: true
+                  schema:
+                    type: string
+              responses:
+                200:
+                  description: successful operation
+                  content:
+                    application/json:
+                      schema:
+                        type: string
+                400:
+                  description: Invalid username/password supplied
+                  content: { }
+
+          '/api/v1/users/me':
+            put:
+              tags: [ User ]
+              summary: Updated user password
+              description: This can only be done by the logged in user.
+              operationId: updatePassword
+              requestBody:
+                description: Updated user object
+                content:
+                  '*/*':
+                    schema:
+                      $ref: '#/components/schemas/ChangePasswordRequest'
+                required: true
+              responses:
+                200:
+                  description: ok
+                  content: { }
+            delete:
+              tags: [ User ]
+              summary: Delete user
+              description: This can only be done by the logged in user.
+              operationId: deleteUser
+              responses:
+                200:
+                  description: ok
+                  content: { }
+
+
 components:
   schemas:
+
+    ChangePasswordRequest:
+      type: object
+      properties:
+        currentPassword:
+          type: string
+        newPassword:
+          type: string
+        newPasswordAgain:
+          type: string
+
+    User:
+      type: object
+      properties:
+        username:
+          type: string
+        email:
+          type: string
+        password:
+          type: string
+        userStatus:
+          type: integer
+          description: User Status
     Quiz:
       allOf:
         - $ref: '#/components/schemas/CreateQuizRequest'
