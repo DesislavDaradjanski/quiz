@@ -40,7 +40,7 @@ paths:
                 $ref: '#/components/schemas/Quiz'
         404:
           description: Quiz doesn't exists
-          content: { }
+          content: {}
 
     delete:
       tags: [ Quiz ]
@@ -49,10 +49,10 @@ paths:
       responses:
         200:
           description: Quiz is deleted successfully
-          content: { }
+          content: {}
         404:
           description: Quiz doesn't exists
-          content: { }
+          content: {}
 
   '/api/v1/quizzes':
     get:
@@ -96,7 +96,7 @@ paths:
       responses:
         201:
           description: The object is created. The response contains redirect to the quiz.
-          content: { }
+          content: {}
 
   '/api/v1/users':
     post:
