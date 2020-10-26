@@ -98,6 +98,107 @@ paths:
           description: The object is created. The response contains redirect to the quiz.
           content: {}
 
+  '/api/v1/quizzes/{quizId}/questions/{questionId}/answers':
+    parameters:
+      - name: quizId
+        in: path
+        required: true
+        schema:
+          type: integer
+      - name: questionId
+        in: path
+        required: true
+        schema:
+          type: integer
+
+    get:
+      tags: [ Answer ]
+      summary: List answers
+      operationId: listAnswers
+      responses:
+        404:
+          description: Not found
+          content: { }
+        200:
+          description: List of answers
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AnswerList'
+
+    post:
+      tags: [ Answer ]
+      summary: Create answer
+      operationId: createAnswer
+      requestBody:
+        description: The object that describes the answer we want to create.
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateAnswerRequest'
+      responses:
+        404:
+          description: Not found
+          content: { }
+        400:
+          description: When answers are more than 10
+          content: { }
+        200:
+          description: Ok
+          content: { }
+
+
+  '/api/v1/quizzes/{quizId}/questions/{questionId}/answers/{answerId}':
+    parameters:
+      - name: quizId
+        in: path
+        required: true
+        schema:
+          type: integer
+      - name: questionId
+        in: path
+        required: true
+        schema:
+          type: integer
+      - name: answerId
+        in: path
+        required: true
+        schema:
+          type: integer
+
+    delete:
+      tags: [ Answer ]
+      summary: Delete Answer
+      operationId: deleteAnswer
+      responses:
+        200:
+          description: Answer is deleted successfully
+          content: {}
+        404:
+          description: Answer doesn't exists
+          content: {}
+
+    put:
+      tags: [ Answer ]
+      summary: Update Answer
+      operationId: updateAnswer
+      requestBody:
+        description: The object that describes the answer we want to create.
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateAnswerRequest'
+      responses:
+        200:
+          description: Answer details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AnswerResponse'
+        404:
+          description: Answer doesn't exists
+          content: {}
+
   '/api/v1/users':
     post:
       tags: [ User ]
@@ -356,6 +457,50 @@ components:
         visible:
           type: boolean
           default: false
+
+    AnswerResponse:
+      allOf:
+        - $ref: '#/components/schemas/CreateAnswerRequest'
+        - type: object
+          required: [ id ]
+          properties:
+            id:
+              type: integer
+
+    AnswerList:
+      type: object
+      required: [ totalPages, totalElements, number, size, numberOfElements, content ]
+      properties:
+        totalPages:
+          type: integer
+        totalElements:
+          type: integer
+        number:
+          type: integer
+        size:
+          type: integer
+        numberOfElements:
+          type: integer
+        content:
+          type: array
+          items:
+            $ref: '#/components/schemas/AnswerResponse'
+
+    CreateAnswerRequest:
+      type: object
+      required: [ description, correct, score ]
+      properties:
+        description:
+          minLength: 5
+          maxLength: 512
+          type: string
+        correct:
+          type: boolean
+          default: false
+        score:
+          minLength: 1
+          maxLength: 10
+          type: integer
 
     CreateQuestionRequest:
       type: object
