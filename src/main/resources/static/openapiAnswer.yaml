@@ -1,0 +1,136 @@
+openapi: 3.0.1
+info:
+  title: Answer
+  description: >
+    Entity of our Spring Boot projects as
+    java students in startit.bg academy.
+  license:
+    name: Apache 2.0
+    url: http://www.apache.org/licenses/LICENSE-2.0.html
+  version: 1.0.0
+tags:
+  - name: Answer
+    description: Everything about answers
+  - name: Question
+    description: Everything about questions
+  - name: Quiz
+    description: Everything about quizzes
+  - name: User
+     description: Everything about users
+paths:
+
+  '/api/v1/quizzes/{quizId}/questions/{questionId}/answers':
+    parameters:
+      - name: answerId
+        in: path
+        required: true
+        schema:
+          type: integer
+
+    get:
+      tags: [ Answer ]
+      summary: Get Answer
+      operationId: readAnswer
+      responses:
+        200:
+          description: Answer details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Answer'
+        404:
+          description: Answer doesn't exists
+          content: {}
+
+    delete:
+      tags: [ Answer ]
+      summary: Delete Answer
+      operationId: deleteAnswer
+      responses:
+        200:
+          description: Answer is deleted successfully
+          content: {}
+        404:
+          description: Answer doesn't exists
+          content: {}
+
+  '/api/v1/answers':
+    get:
+      tags: [ Answer ]
+      summary: List answers
+      operationId: listAnswers
+      parameters:
+        - name: quizId
+          in: query
+          required: false
+          schema:
+            type: integer
+        - name: questionId
+          in: query
+          required: false
+          schema:
+            type: integer
+      responses:
+        200:
+          description: List of answers
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AnswerList'
+
+    post:
+      tags: [ Answer ]
+      summary: Create answer
+      operationId: createAnswer
+      requestBody:
+        description: The object that describes the answer we want to create.
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateAnswerRequest'
+
+components:
+  schemas:
+    Answer:
+      allOf:
+        - $ref: '#/components/schemas/CreateAnswerRequest'
+        - type: object
+          required: [ id ]
+          properties:
+            id:
+              type: integer
+
+    AnswerList:
+      type: object
+      required: [ totalPages, totalElements, number, size, numberOfElements, content ]
+      properties:
+        totalPages:
+          type: integer
+        totalElements:
+          type: integer
+        number:
+          type: integer
+        size:
+          type: integer
+        numberOfElements:
+          type: integer
+        content:
+          type: array
+          items:
+            $ref: '#/components/schemas/Answer'
+
+    CreateAnswerRequest:
+      type: object
+      required: [ description ]
+      properties:
+        description:
+          minLength: 5
+          maxLength: 512
+          type: string
+        correct:
+          type: boolean
+          default: false
+        score:
+          minLength: 1
+            maxLength: 10
+            type: integer
