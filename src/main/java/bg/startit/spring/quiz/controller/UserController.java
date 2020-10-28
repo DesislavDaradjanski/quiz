@@ -1,20 +1,19 @@
 package bg.startit.spring.quiz.controller;
 
+import bg.startit.spring.quiz.api.UserApi;
 import bg.startit.spring.quiz.dto.ChangePasswordRequest;
+import bg.startit.spring.quiz.dto.CreateUserRequest;
 import bg.startit.spring.quiz.dto.UserResponse;
 import bg.startit.spring.quiz.model.User;
 import bg.startit.spring.quiz.repository.UserRepository;
 import java.net.URI;
+import javax.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -22,38 +21,29 @@ import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 @Validated
 @RestController
-@RequestMapping("/api/v1/users")
-public class UserController {
+@RequestMapping
+public class UserController implements UserApi {
 
   @Autowired
   private UserRepository userRepository;
   @Autowired
   private PasswordEncoder passwordEncoder;
-
-  // /api/v1/users -> create (register)
-  // /api/v1/users/me -> read, update(change password), delete (unregister)
-  @PostMapping
-  public ResponseEntity<Void> register(@RequestBody User user) {
-    user = userRepository.save(user);
-
-    // POST (data) -> return Redirect to GET link
-    URI redirect = ServletUriComponentsBuilder
-        .fromCurrentRequest()
-        .path("/me") // link to /api/v1/users/me
-        .build()
-        .toUri();
-    return ResponseEntity.created(redirect).build();
-  }
-
-  @GetMapping("/me")
+  
+  @Override
   public ResponseEntity<UserResponse> readUser() {
     User current = getCurrentUser();
-    return ResponseEntity.ok(new UserResponse()
-        .username(current.getName()));
+    return ResponseEntity.ok(toResponse(current));
   }
 
-  @PutMapping("/me")
-  public ResponseEntity<User> updatePassword(@RequestBody ChangePasswordRequest passwordRequest) {
+  private static UserResponse toResponse(User entity) {
+    return new UserResponse()
+        .username(entity.getName());
+  }
+
+  //TODO  validate new password
+  @Override
+  public ResponseEntity<UserResponse> updatePassword(
+      @RequestBody ChangePasswordRequest passwordRequest) {
     User toUpdate = getCurrentUser();
     // 1. check current password
     if (!passwordEncoder.matches(passwordRequest.getCurrentPassword(), toUpdate.getPassword())) {
@@ -69,13 +59,33 @@ public class UserController {
     toUpdate.setPasswordHash(encodedPassword.toCharArray());
     userRepository.save(toUpdate);
 
-    return ResponseEntity.ok(toUpdate);
+    return ResponseEntity.ok(toResponse(toUpdate));
   }
 
-  @DeleteMapping("/me")
-  public void deleteUser() {
+  //TODO  validate username to not contain space in name and repeating characters
+  @Override
+  public ResponseEntity<Void> createUser(@Valid CreateUserRequest createUserRequest) {
+    User user = new User();
+    user.setName(createUserRequest.getUsername());
+    user.setEmail(createUserRequest.getEmail());
+    user.setPasswordHash(passwordEncoder.encode(createUserRequest.getPassword()).toCharArray());
+
+    user = userRepository.save(user);
+
+    // POST (data) -> return Redirect to GET link
+    URI redirect = ServletUriComponentsBuilder
+        .fromCurrentRequest()
+        .path("/me") // link to /api/v1/users/me
+        .build()
+        .toUri();
+    return ResponseEntity.created(redirect).build();
+  }
+
+  @Override
+  public ResponseEntity<Void> deleteUser() {
     User user = getCurrentUser();
     userRepository.delete(user);
+    return ResponseEntity.ok().build();
   }
 
   private User getCurrentUser() {
