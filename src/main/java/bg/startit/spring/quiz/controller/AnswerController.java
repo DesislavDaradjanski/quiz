@@ -1,38 +1,21 @@
 package bg.startit.spring.quiz.controller;
 
 import bg.startit.spring.quiz.api.AnswerApi;
-import bg.startit.spring.quiz.dto.AnswerList;
 import bg.startit.spring.quiz.dto.AnswerResponse;
 import bg.startit.spring.quiz.dto.CreateAnswerRequest;
 import bg.startit.spring.quiz.model.Answer;
 import bg.startit.spring.quiz.model.Question;
-import bg.startit.spring.quiz.model.Quiz;
 import bg.startit.spring.quiz.repository.AnswerRepository;
 import bg.startit.spring.quiz.repository.QuestionRepository;
 import bg.startit.spring.quiz.repository.QuizRepository;
-import java.net.URI;
 import java.util.List;
 import java.util.stream.Collectors;
 import javax.validation.Valid;
-import javax.validation.constraints.Max;
-import javax.validation.constraints.PositiveOrZero;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 @Validated
 @RestController
