@@ -55,6 +55,29 @@ paths:
           description: Quiz doesn't exists
           content: {}
 
+    put:
+      tags: [ Quiz ]
+      summary: Update Quiz
+      operationId: updateQuiz
+      requestBody:
+        description: The object that describes the quiz we want to update.
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateQuizRequest'
+      responses:
+        200:
+          description: Quiz details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/QuizResponse'
+        404:
+          description: Quiz doesn't exists
+          content: {}
+
+
   '/api/v1/quizzes':
     get:
       tags: [ Quiz ]
@@ -90,6 +113,7 @@ paths:
       operationId: createQuiz
       requestBody:
         description: The object that describes the quiz we want to create.
+        required: true
         content:
           application/json:
             schema:
@@ -434,6 +458,7 @@ components:
           properties:
             id:
               type: integer
+              format: int64
 
     QuizList:
       type: object
@@ -443,6 +468,7 @@ components:
           type: integer
         totalElements:
           type: integer
+          format: int64
         number:
           type: integer
         size:
