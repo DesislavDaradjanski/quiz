@@ -1,5 +1,9 @@
 package bg.startit.spring.quiz.controller;
 
+import bg.startit.spring.quiz.api.QuestionApi;
+import bg.startit.spring.quiz.dto.CreateQuestionRequest;
+import bg.startit.spring.quiz.dto.QuestionList;
+import bg.startit.spring.quiz.dto.QuestionResponse;
 import bg.startit.spring.quiz.model.Question;
 import bg.startit.spring.quiz.model.Quiz;
 import bg.startit.spring.quiz.repository.QuestionRepository;
@@ -11,8 +15,6 @@ import javax.validation.constraints.PositiveOrZero;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.annotation.Validated;
@@ -29,8 +31,8 @@ import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 @Validated
 @RestController
-@RequestMapping("/api/v1/quizzes/{quizId}/questions")
-public class QuestionController {
+@RequestMapping
+public class QuestionController implements QuestionApi {
 
   // /api/v1/quizzes/{quizId}/questions - list, create
   // /api/v1/quizzes/{quizId}/questions/{questionId} -  read, delete, update
@@ -41,12 +43,58 @@ public class QuestionController {
   @Autowired
   private QuizRepository quizRepository;
 
-  @PostMapping
-  public ResponseEntity<Void> createQuestion(@PathVariable Long quizId,
-      @RequestBody Question question) {
+
+  // "/api/v1/quizzes/{quizId}/questions/{questionId}"
+  @Override
+  public ResponseEntity<QuestionResponse> readQuestion(@PathVariable Long quizId,
+      @PathVariable Long questionId) {
+    if (questionRepository.existsById(questionId)) {
+      // hibernate returns class, that extends our Quiz and has some additional properties
+      // but we don't know how to serialize them.
+      Question question = questionRepository.getOne(questionId);
+      // copy quiz, so we can remove the properties, added by hibernate
+      QuestionResponse ret = toResponse(question);
+
+      return ResponseEntity.ok(ret);
+    } else {
+      return ResponseEntity.notFound().build();
+    }
+  }
+
+  private static QuestionResponse toResponse(Question question) {
+    QuestionResponse ret = new QuestionResponse()
+        .id(question.getId())
+        .title(question.getTitle())
+        .description(question.getDescription())
+        .type(question.getType().name());
+    return ret;
+  }
+
+  @Override
+  public ResponseEntity<QuestionResponse> updateQuestion(Long quizId, Long questionId,
+      @Valid CreateQuestionRequest createQuestionRequest) {
+    if (!questionRepository.existsById(questionId)) {
+      return ResponseEntity.notFound().build();
+    }
+    Question question = new Question();
+    Question toUpdate = questionRepository.getOne(questionId);
+    // 2. modify the object
+    toUpdate.setDescription(question.getDescription());
+    toUpdate.setTitle(question.getTitle());
+    toUpdate.setType(question.getType());
+    // 3. save the object
+    questionRepository.save(toUpdate);
+
+    return ResponseEntity.ok(toResponse(toUpdate));
+  }
+
+  @Override
+  public ResponseEntity<Void> createQuestion(Long quizId,
+      @Valid CreateQuestionRequest createQuestionRequest) {
     if (!quizRepository.existsById(quizId)) {
       return ResponseEntity.notFound().build();
     }
+    Question question = new Question();
     Quiz quiz = quizRepository.getOne(quizId);
     question.setQuiz(quiz);
     question = questionRepository.save(question);
@@ -60,27 +108,15 @@ public class QuestionController {
     return ResponseEntity.created(redirect).build();
   }
 
-  // "/api/v1/quizzes/{quizId}/questions/{questionId}"
-  @GetMapping("/{questionId}")
-  @Transactional
-  public ResponseEntity<Question> readQuestion(@PathVariable Long quizId,
-      @PathVariable Long questionId) {
-    if (questionRepository.existsById(questionId)) {
-      // hibernate returns class, that extends our Quiz and has some additional properties
-      // but we don't know how to serialize them.
-      Question quiz = questionRepository.getOne(questionId);
-      // copy quiz, so we can remove the properties, added by hibernate
-      Question ret = new Question(questionId, quiz.getTitle(), quiz.getDescription(),
-          quiz.getType(), null);
-      return ResponseEntity.ok(ret);
-    } else {
-      return ResponseEntity.notFound().build();
-    }
+  @Override
+  public ResponseEntity<Void> deleteQuestion(Long quizId, Long questionId) {
+    questionRepository.deleteById(questionId);
+    return ResponseEntity.ok().build();
   }
 
   //api/v1/quizzes/{quizId}/questions?page=0&size=30
-  @GetMapping
-  public ResponseEntity<Page<Question>> listQuestion(
+  @Override
+  public ResponseEntity<QuestionList> listQuestion(
       @PathVariable Long quizId,
       @PositiveOrZero @Valid @RequestParam(required = false, defaultValue = "0") Integer page,
       @PositiveOrZero @Max(100) @Valid @RequestParam(required = false, defaultValue = "20") Integer size
@@ -93,31 +129,13 @@ public class QuestionController {
     Page<Question> list = questionRepository.findByQuiz(
         quizRepository.getOne(quizId),
         PageRequest.of(page, size));
-    return ResponseEntity.ok(list);
+    QuestionList response = new QuestionList()
+        .totalPages(list.getTotalPages())
+        .totalElements(list.getTotalElements())
+        .number(list.getNumber())
+        .size(list.getSize())
+        .numberOfElements(list.getNumberOfElements());
+
+    return ResponseEntity.ok(response);
   }
-
-  @DeleteMapping("/{questionId}")
-  public void deleteQuestion(@PathVariable Long questionId) {
-    questionRepository.deleteById(questionId);
-  }
-
-  @PutMapping("/{questionId}")
-  @Transactional
-  public ResponseEntity<Question> updateQuestion(@RequestBody Question question,
-      @PathVariable Long questionId) {
-    if (!questionRepository.existsById(questionId)) {
-      return ResponseEntity.notFound().build();
-    }
-    Question toUpdate = questionRepository.getOne(questionId);
-    // 2. modify the object
-    toUpdate.setDescription(question.getDescription());
-    toUpdate.setTitle(question.getTitle());
-    toUpdate.setType(question.getType());
-    // 3. save the object
-    questionRepository.save(toUpdate);
-
-    return ResponseEntity.ok(toUpdate);
-
-  }
-
 }
