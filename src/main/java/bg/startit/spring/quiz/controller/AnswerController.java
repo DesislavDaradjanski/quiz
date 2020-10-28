@@ -1,5 +1,9 @@
 package bg.startit.spring.quiz.controller;
 
+import bg.startit.spring.quiz.api.AnswerApi;
+import bg.startit.spring.quiz.dto.AnswerList;
+import bg.startit.spring.quiz.dto.AnswerResponse;
+import bg.startit.spring.quiz.dto.CreateAnswerRequest;
 import bg.startit.spring.quiz.model.Answer;
 import bg.startit.spring.quiz.model.Question;
 import bg.startit.spring.quiz.model.Quiz;
@@ -8,6 +12,7 @@ import bg.startit.spring.quiz.repository.QuestionRepository;
 import bg.startit.spring.quiz.repository.QuizRepository;
 import java.net.URI;
 import java.util.List;
+import java.util.stream.Collectors;
 import javax.validation.Valid;
 import javax.validation.constraints.Max;
 import javax.validation.constraints.PositiveOrZero;
@@ -31,8 +36,8 @@ import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 @Validated
 @RestController
-@RequestMapping("/api/v1/quizzes/{quizId}/questions/{questionId}/answers")
-public class AnswerController {
+@RequestMapping
+public class AnswerController implements AnswerApi {
   // /api/v1/quizzes/{quizId}/questions/{questionId}/answers -  list, create
   // /api/v1/quizzes/{quizId}/questions/{questionId}/answers/{answerId} -  delete, update
 
@@ -56,28 +61,10 @@ public class AnswerController {
   @Autowired
   private AnswerRepository answerRepository;
 
-  // /api/v1/quizzes/{quizId}/questions/{questionId}/answers
-  @GetMapping
-  public ResponseEntity<List<Answer>> listAnswer(
-      @PathVariable Long quizId,
-      @PathVariable Long questionId) {
-    if (!quizRepository.existsById(quizId)) {
-      return ResponseEntity.notFound().build();
-    }
-    if (!questionRepository.existsById(questionId)) {
-      return ResponseEntity.notFound().build();
-    }
-    List<Answer> list = answerRepository.findByQuestionId(questionId);
 
-    return ResponseEntity.ok(list);
-  }
-
-  // /api/v1/quizzes/{quizId}/questions/{questionId}/answers
-  @PostMapping
-  public ResponseEntity<Void> createAnswer(
-      @PathVariable Long quizId,
-      @PathVariable Long questionId,
-      @RequestBody Answer answer) {
+  @Override
+  public ResponseEntity<Void> createAnswer(Long quizId, Long questionId,
+      @Valid CreateAnswerRequest createAnswerRequest) {
     if (!quizRepository.existsById(quizId)) {
       return ResponseEntity.notFound().build();
     }
@@ -94,18 +81,15 @@ public class AnswerController {
 
     // add answer
     Question question = questionRepository.getOne(questionId);
+    Answer answer = new Answer();
     answer.setQuestion(question);
     answerRepository.save(answer);
 
     return ResponseEntity.ok().build();
   }
 
-  // /api/v1/quizzes/{quizId}/questions/{questionId}/answers/{answerId}
-  @DeleteMapping("/{id}")
-  public ResponseEntity<Void> deleteAnswer(
-      @PathVariable Long quizId,
-      @PathVariable Long questionId,
-      @PathVariable Long answerId) {
+  @Override
+  public ResponseEntity<Void> deleteAnswer(Long quizId, Long questionId, Long answerId) {
     if (!answerRepository.existsById(answerId)) {
       return ResponseEntity.notFound().build();
     }
@@ -113,24 +97,40 @@ public class AnswerController {
     return ResponseEntity.ok().build();
   }
 
+  @Override
+  public ResponseEntity<List<AnswerResponse>> listAnswers(Long quizId, Long questionId) {
+    if (!quizRepository.existsById(quizId)) {
+      return ResponseEntity.notFound().build();
+    }
+    if (!questionRepository.existsById(questionId)) {
+      return ResponseEntity.notFound().build();
+    }
+    List<Answer> list = answerRepository.findByQuestionId(questionId);
+    List<AnswerResponse> response = list.stream()
+        .map(AnswerController::toResponse)
+        .collect(Collectors.toList());
+    return ResponseEntity.ok(response);
+  }
 
-  // /api/v1/quizzes/{quizId}/questions/{questionId}/answers/{answerId}
-  @PutMapping("/{id}")
-  @Transactional
-  public ResponseEntity<Answer> updateAnswer(
-      @PathVariable Long quizId,
-      @PathVariable Long questionId,
-      @PathVariable Long answerId,
-      @RequestBody Answer answer) {
+  @Override
+  public ResponseEntity<AnswerResponse> updateAnswer(Long quizId, Long questionId, Long answerId,
+      @Valid CreateAnswerRequest createAnswerRequest) {
     if (!answerRepository.existsById(answerId)) {
       return ResponseEntity.notFound().build();
     }
     Answer toUpdate = answerRepository.getOne(answerId);
-    toUpdate.setDescription(answer.getDescription());
-    toUpdate.setCorrect(answer.isCorrect());
-    toUpdate.setScore(answer.getScore());
-
+    toUpdate.setDescription(createAnswerRequest.getDescription());
+    toUpdate.setScore(createAnswerRequest.getScore());
+    toUpdate.setCorrect(createAnswerRequest.getCorrect());
     answerRepository.save(toUpdate);
-    return ResponseEntity.ok(toUpdate);
+    return ResponseEntity.ok(toResponse(toUpdate));
+  }
+
+  private static AnswerResponse toResponse(Answer toUpdate) {
+    return new AnswerResponse()
+        .id(toUpdate.getId())
+        .description(toUpdate.getDescription())
+        .correct(toUpdate.isCorrect())
+        .score(toUpdate.getScore());
   }
 }
