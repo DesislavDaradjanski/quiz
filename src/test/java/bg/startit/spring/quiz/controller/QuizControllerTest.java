@@ -1,6 +1,15 @@
 package bg.startit.spring.quiz.controller;
 
-import bg.startit.spring.quiz.model.Question;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
+import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.header;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+
 import bg.startit.spring.quiz.repository.QuizRepository;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -8,24 +17,13 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
-import org.springframework.data.jpa.repository.support.SimpleJpaRepository;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.test.web.servlet.MockMvcBuilder;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
-import org.springframework.transaction.TransactionException;
-import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.context.WebApplicationContext;
 import org.springframework.web.util.NestedServletException;
-
-import static org.junit.jupiter.api.Assertions.*;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
-import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.header;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @SpringBootTest(webEnvironment = WebEnvironment.RANDOM_PORT)
 @ActiveProfiles("test")
@@ -52,9 +50,16 @@ class QuizControllerTest {
 
   @Test
   void createQuiz_with_invalidTitle_should_fail() throws Exception {
-    assertThrows(NestedServletException.class, () -> {
-      createQuiz("VP", true, "Verano Azur");
-    });
+    String content = String.format("{\n"
+        + "    \"title\":\"%s\",\n"
+        + "    \"description\":\"%s\",\n"
+        + "    \"visible\": %b \n"
+        + "}", "VP", "Verano Azur", true);
+    http.perform(post("/api/v1/quizzes")
+        .contentType(MediaType.APPLICATION_JSON)
+        .accept(MediaType.APPLICATION_JSON)
+        .content(content)) // content is used *only* with @RequestBody
+        .andExpect(status().is4xxClientError());
   }
 
   private String createQuiz(String title, boolean visible, String description) throws Exception {
@@ -111,8 +116,8 @@ class QuizControllerTest {
         .andExpect(jsonPath("$.content[1].title").value("Godfather"));
 
     http.perform(get("/api/v1/quizzes")
-          .queryParam("page", "1")
-          .queryParam("size", "1"))
+        .queryParam("page", "1")
+        .queryParam("size", "1"))
         .andDo(print())
         .andExpect(status().isOk())
         .andExpect(jsonPath("$.totalPages").value(2))
@@ -142,7 +147,7 @@ class QuizControllerTest {
   }
 
   @Test
-  void  list_with_negative_page_must_fail(){
+  void list_with_negative_page_must_fail() {
     assertThrows(NestedServletException.class, () -> {
       http.perform(get("/api/v1/quizzes").queryParam("page", "-1"))
           .andDo(print());
@@ -150,14 +155,15 @@ class QuizControllerTest {
   }
 
   @Test
-  void  list_with_negative_size_must_fail(){
+  void list_with_negative_size_must_fail() {
     assertThrows(NestedServletException.class, () -> {
       http.perform(get("/api/v1/quizzes").queryParam("size", "-1"))
           .andDo(print());
     });
   }
+
   @Test
-  void  list_with_bigger_size_must_fail(){
+  void list_with_bigger_size_must_fail() {
     assertThrows(NestedServletException.class, () -> {
       http.perform(get("/api/v1/quizzes?size=101"))
           .andDo(print());
@@ -213,14 +219,12 @@ class QuizControllerTest {
         + "    \"visible\": %b \n"
         + "}", "JJ", "", false);
 
-    assertThrows(NestedServletException.class, () -> {
-      http.perform(put(link)
-          .contentType(MediaType.APPLICATION_JSON)
-          .accept(MediaType.APPLICATION_JSON)
-          .content(content)) // content is used *only* with @RequestBody
-          .andDo(print())
-          .andExpect(status().isOk());
-    });
+    http.perform(put(link)
+        .contentType(MediaType.APPLICATION_JSON)
+        .accept(MediaType.APPLICATION_JSON)
+        .content(content)) // content is used *only* with @RequestBody
+        .andDo(print())
+        .andExpect(status().is4xxClientError());
 
     http.perform(get(link))
         .andDo(print())
