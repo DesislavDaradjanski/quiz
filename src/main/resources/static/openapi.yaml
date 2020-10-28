@@ -127,7 +127,9 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/AnswerList'
+                type: array
+                items:
+                 $ref: '#/components/schemas/AnswerResponse'
 
     post:
       tags: [ Answer ]
@@ -475,25 +477,7 @@ components:
           properties:
             id:
               type: integer
-
-    AnswerList:
-      type: object
-      required: [ totalPages, totalElements, number, size, numberOfElements, content ]
-      properties:
-        totalPages:
-          type: integer
-        totalElements:
-          type: integer
-        number:
-          type: integer
-        size:
-          type: integer
-        numberOfElements:
-          type: integer
-        content:
-          type: array
-          items:
-            $ref: '#/components/schemas/AnswerResponse'
+              format: int64
 
     CreateAnswerRequest:
       type: object
