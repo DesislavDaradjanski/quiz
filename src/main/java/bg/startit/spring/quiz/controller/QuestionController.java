@@ -9,6 +9,7 @@ import bg.startit.spring.quiz.model.Quiz;
 import bg.startit.spring.quiz.repository.QuestionRepository;
 import bg.startit.spring.quiz.repository.QuizRepository;
 import java.net.URI;
+import java.util.stream.Collectors;
 import javax.validation.Valid;
 import javax.validation.constraints.Max;
 import javax.validation.constraints.PositiveOrZero;
@@ -134,7 +135,10 @@ public class QuestionController implements QuestionApi {
         .totalElements(list.getTotalElements())
         .number(list.getNumber())
         .size(list.getSize())
-        .numberOfElements(list.getNumberOfElements());
+        .numberOfElements(list.getNumberOfElements())
+        .content(list.getContent().stream()
+            .map(QuestionController::toResponse)
+            .collect(Collectors.toList()));
 
     return ResponseEntity.ok(response);
   }
