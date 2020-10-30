@@ -3,11 +3,13 @@ package bg.startit.spring.quiz.controller;
 import bg.startit.spring.quiz.api.AnswerApi;
 import bg.startit.spring.quiz.dto.AnswerResponse;
 import bg.startit.spring.quiz.dto.CreateAnswerRequest;
+import bg.startit.spring.quiz.exception.TooManyAnswersException;
 import bg.startit.spring.quiz.model.Answer;
 import bg.startit.spring.quiz.model.Question;
 import bg.startit.spring.quiz.repository.AnswerRepository;
 import bg.startit.spring.quiz.repository.QuestionRepository;
 import bg.startit.spring.quiz.repository.QuizRepository;
+import bg.startit.spring.quiz.service.AnswerService;
 import java.util.List;
 import java.util.stream.Collectors;
 import javax.validation.Valid;
@@ -35,49 +37,35 @@ public class AnswerController implements AnswerApi {
   // when creating answer, we shouldn't exceed a given limit
 
   final int MAX_NUMBER_OF_ANSWERS = 10;
-  @Autowired
-  private QuestionRepository questionRepository;
 
   @Autowired
-  private QuizRepository quizRepository;
-
-  @Autowired
-  private AnswerRepository answerRepository;
+  private AnswerService answerService;
 
 
   @Override
   public ResponseEntity<Void> createAnswer(Long quizId, Long questionId,
       @Valid CreateAnswerRequest createAnswerRequest) {
-    if (!quizRepository.existsById(quizId)) {
+    if (!answerService.exists(quizId, questionId)) {
       return ResponseEntity.notFound().build();
     }
-    if (!questionRepository.existsById(questionId)) {
-      return ResponseEntity.notFound().build();
-    }
-    // check limit
-    // 1. list all answers to the given question
-    // 2. if list size exceeds maximum size - return error
-    List<Answer> list = answerRepository.findByQuestionId(questionId);
-    if (list.size() >= MAX_NUMBER_OF_ANSWERS) {
+
+    try {
+      answerService.create(questionId);
+    } catch (TooManyAnswersException e) {
       return ResponseEntity.badRequest().build();
     }
 
-    // add answer
-    Question question = questionRepository.getOne(questionId);
-    Answer answer = new Answer();
-    answer.setQuestion(question);
-    answerRepository.save(answer);
-
     return ResponseEntity.ok().build();
+
   }
 
   @Override
   public ResponseEntity<Void> deleteAnswer(Long quizId, Long questionId, Long answerId) {
-    if (!answerRepository.existsById(answerId)) {
+    if (!answerService.delete(answerId)) {
       return ResponseEntity.notFound().build();
+    } else {
+      return ResponseEntity.ok().build();
     }
-    answerRepository.deleteById(answerId);
-    return ResponseEntity.ok().build();
   }
 
   @Override
