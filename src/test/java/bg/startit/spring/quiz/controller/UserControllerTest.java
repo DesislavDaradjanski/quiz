@@ -1,13 +1,11 @@
 package bg.startit.spring.quiz.controller;
 
-import static org.hamcrest.Matchers.*;
-import static org.junit.jupiter.api.Assertions.*;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
-import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.header;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static org.hamcrest.Matchers.matchesPattern;
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.user;
 import static org.springframework.security.test.web.servlet.setup.SecurityMockMvcConfigurers.springSecurity;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
+import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.*;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 import bg.startit.spring.quiz.repository.UserRepository;
 import org.junit.jupiter.api.AfterEach;
@@ -18,7 +16,8 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
-import org.springframework.security.test.context.support.WithMockUser;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.test.context.support.WithUserDetails;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
@@ -37,6 +36,10 @@ class UserControllerTest {
   @Autowired
   private WebApplicationContext context;
 
+  @Autowired
+  private UserDetailsService userDetailsService;
+  private UserDetails testUserDetails;
+
   @BeforeEach
   void setUp() throws Exception {
     http = MockMvcBuilders
@@ -44,6 +47,7 @@ class UserControllerTest {
         .apply(springSecurity())
         .build();
     createUser("testuser", "testuser@abv.bg", "Qwerty1234!");
+    testUserDetails = userDetailsService.loadUserByUsername("testuser@abv.bg");
   }
 
   @AfterEach
@@ -58,7 +62,9 @@ class UserControllerTest {
 
   //TODO :
   @Test
-  @WithUserDetails("testuser")
+  // To use the annotation below, the user MUST be created in data.sql,
+  // As the line is executed before setUp method.
+//  @WithUserDetails(value = "testuser@abv.bg")
   void updatePassword() throws Exception {
     String content = String.format("{\n"
         + "    \"currentPassword\":\"%s\",\n"
@@ -67,6 +73,7 @@ class UserControllerTest {
         + "}", "Qwerty1234!", "Qwerty12345!", "Qwerty12345!");
 
     http.perform(put("/api/v1/users/me")
+        .with(user(testUserDetails)) // supply current logged user
         .contentType(MediaType.APPLICATION_JSON)
         .accept(MediaType.APPLICATION_JSON)
         .content(content)) // content is used *only* with @RequestBody
